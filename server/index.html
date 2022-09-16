@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .life-game__canvas-container {
+        top: 0;
+        left: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .life-game__actions-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin: 0 0 1rem 0;
+      }
+      .life-game__play-button {
+        appearance: none;
+        width: 6rem;
+        border-radius: 8px;
+        padding: 0.5rem 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        outline: none;
+        background: #e74c3c;
+        color: #ffffff;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .life-game__play-button:hover {
+        background: #2ecc71;
+      }
+      .life-game__label {
+        margin: 0 0 1rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="life-game__canvas-container">
+      <div class="life-game__actions-container">
+        <label class="life-game__label">
+          <span> Staus: </span>
+          <span id="game-status"> None </span>
+        </label>
+        <label class="life-game__label">
+          <span> Points: </span>
+          <span id="game-points"> 0 </span>
+        </label>
+        <button id="play-button" class="life-game__play-button">PLAY!</button>
+      </div>
+      <canvas id="life-game-canvas"></canvas>
+    </div>
+    <script src="./bootstrap.js"></script>
+  </body>
+</html>
