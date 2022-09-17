@@ -1,3 +1,4 @@
+use std::fmt;
 use wasm_bindgen::prelude::*;
 // use wee_alloc::WeeAlloc;
 
@@ -18,6 +19,24 @@ pub struct Universe {
   width: u32,
   height: u32,
   cells: Vec<Cell>,
+}
+
+// The state of the universe is represented as a vector of cells. To make this human readable,
+// let's implement a basic text renderer. The idea is to write the universe line by line
+// as text, and for each cell that is alive, print the Unicode character ◼ ("black medium square").
+// For dead cells, we'll print ◻ (a "white medium square").
+impl fmt::Display for Universe {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    for line in self.cells.as_slice().chunks(self.width as usize) {
+      for &cell in line {
+        let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
+        write!(f, "{}", symbol)?;
+      }
+      write!(f, "\n")?;
+    }
+
+    Ok(())
+  }
 }
 
 // The universe can be rappresented as a flat array that lives in the WebAssembly linear memory,
