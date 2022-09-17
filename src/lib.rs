@@ -51,6 +51,28 @@ impl fmt::Display for Universe {
 // Public methods, exported to JavaScript.
 #[wasm_bindgen]
 impl Universe {
+  // constructor that initializes the universe with an interesting pattern of live and dead cells
+  pub fn new() -> Universe {
+    let width = 64;
+    let height = 64;
+
+    let cells = (0..width * height)
+      .map(|i| {
+        if i % 2 == 0 || i % 7 == 0 {
+          Cell::Alive
+        } else {
+          Cell::Dead
+        }
+      })
+      .collect();
+
+    Universe {
+      width,
+      height,
+      cells,
+    }
+  }
+
   // To access the cell at a given row and column, we translate the row and column into an
   // index into the cells vector
   fn get_index(&self, row: u32, column: u32) -> usize {
