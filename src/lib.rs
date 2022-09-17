@@ -100,8 +100,8 @@ impl Universe {
         }
         let neighbor_row = (row + delta_row) % self.height;
         let neighbor_column = (column + delta_column) % self.width;
-        let index = self.get_index(neighbor_row, neighbor_column);
-        count += self.cells[index] as u8;
+        let cell_index = self.get_index(neighbor_row, neighbor_column);
+        count += self.cells[cell_index] as u8;
       }
     }
     count
