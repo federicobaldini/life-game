@@ -69,18 +69,34 @@ const drawCells = (
 };
 
 init().then((wasm: InitOutput) => {
-  const pre = document.getElementById("game-of-life-canvas");
-  const universe = Universe.new();
+  // Construct the universe, and get its width and height.
+  const universe: Universe = Universe.new(64, 64);
+  const width: number = universe.width();
+  const height: number = universe.height();
 
-  const renderLoop = () => {
-    const frame_per_second: number = 10;
-    setTimeout(() => {
-      pre.textContent = universe.render();
-      universe.update();
+  const lifeCanvasElement: HTMLCanvasElement | null = document.getElementById(
+    "life-game-canvas"
+  ) as HTMLCanvasElement | null;
 
-      requestAnimationFrame(renderLoop);
-    }, 1000 / frame_per_second);
-  };
+  if (lifeCanvasElement) {
+    lifeCanvasElement.height = (CELL_SIZE + 1) * height + 1;
+    lifeCanvasElement.width = (CELL_SIZE + 1) * width + 1;
 
-  requestAnimationFrame(renderLoop);
+    const lifeCanvasContext: CanvasRenderingContext2D =
+      lifeCanvasElement.getContext("2d");
+
+    const renderLoop = () => {
+      const frame_per_second: number = 18;
+      setTimeout(() => {
+        universe.update();
+
+        // drawGrid(lifeCanvasContext, width, height);
+        drawCells(universe, lifeCanvasContext, wasm.memory, width, height);
+
+        requestAnimationFrame(renderLoop);
+      }, 1000 / frame_per_second);
+    };
+
+    requestAnimationFrame(renderLoop);
+  }
 });
