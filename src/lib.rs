@@ -47,6 +47,9 @@ impl fmt::Display for Universe {
 // states after each tick, instead of exposing the whole universe to JavaScript. This way,
 // JavaScript wouldn't need to iterate over the whole universe when rendering, only the relevant subset.
 // The trade off is that this delta-based design is slightly more difficult to implement.
+//
+// Public methods, exported to JavaScript.
+#[wasm_bindgen]
 impl Universe {
   // To access the cell at a given row and column, we translate the row and column into an
   // index into the cells vector
