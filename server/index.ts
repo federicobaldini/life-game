@@ -70,7 +70,7 @@ const drawCells = (
 
 init().then((wasm: InitOutput) => {
   // Construct the universe, and get its width and height.
-  const universe: Universe = Universe.new(64, 64);
+  const universe: Universe = Universe.new(100, 100);
   const width: number = universe.width();
   const height: number = universe.height();
 
@@ -79,8 +79,14 @@ init().then((wasm: InitOutput) => {
   ) as HTMLCanvasElement | null;
 
   if (lifeCanvasElement) {
+    /*
+    With grid:
     lifeCanvasElement.height = (CELL_SIZE + 1) * height + 1;
     lifeCanvasElement.width = (CELL_SIZE + 1) * width + 1;
+    */
+
+    lifeCanvasElement.height = CELL_SIZE * height;
+    lifeCanvasElement.width = CELL_SIZE * width;
 
     const lifeCanvasContext: CanvasRenderingContext2D =
       lifeCanvasElement.getContext("2d");
