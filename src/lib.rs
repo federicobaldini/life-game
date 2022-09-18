@@ -171,4 +171,9 @@ impl Universe {
     self.cells = next;
     self.generation += 1;
   }
+
+  pub fn reset(&mut self) {
+    self.cells = (0..self.width * self.height).map(|_| Cell::Dead).collect();
+    self.population = 0;
+  }
 }
