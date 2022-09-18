@@ -19,6 +19,8 @@ pub struct Universe {
   width: u32,
   height: u32,
   cells: Vec<Cell>,
+  population: u32,
+  generation: u32,
 }
 
 // The state of the universe is represented as a vector of cells. To make this human readable,
@@ -53,9 +55,11 @@ impl fmt::Display for Universe {
 impl Universe {
   // constructor that initializes the universe with an interesting pattern of live and dead cells
   pub fn new(width: u32, height: u32) -> Universe {
+    let mut population = 0;
     let cells = (0..width * height)
       .map(|i| {
         if i % 2 == 0 || i % 7 == 0 {
+          population += 1;
           Cell::Alive
         } else {
           Cell::Dead
@@ -67,6 +71,8 @@ impl Universe {
       width,
       height,
       cells,
+      population,
+      generation: 0,
     }
   }
 
@@ -80,6 +86,14 @@ impl Universe {
 
   pub fn cells(&self) -> *const Cell {
     self.cells.as_ptr()
+  }
+
+  pub fn population(&self) -> u32 {
+    self.population
+  }
+
+  pub fn generation(&self) -> u32 {
+    self.generation
   }
 
   pub fn render(&self) -> String {
@@ -128,16 +142,25 @@ impl Universe {
         let next_cell = match (cell, live_neighbors) {
           // Rule 1: Any live cell with fewer than two live neighbours
           // dies, as if caused by underpopulation.
-          (Cell::Alive, x) if x < 2 => Cell::Dead,
+          (Cell::Alive, x) if x < 2 => {
+            self.population -= 1;
+            Cell::Dead
+          }
           // Rule 2: Any live cell with two or three live neighbours
           // lives on to the next generation.
           (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
           // Rule 3: Any live cell with more than three live
           // neighbours dies, as if by overpopulation.
-          (Cell::Alive, x) if x > 3 => Cell::Dead,
+          (Cell::Alive, x) if x > 3 => {
+            self.population -= 1;
+            Cell::Dead
+          }
           // Rule 4: Any dead cell with exactly three live neighbours
           // becomes a live cell, as if by reproduction.
-          (Cell::Dead, 3) => Cell::Alive,
+          (Cell::Dead, 3) => {
+            self.population += 1;
+            Cell::Alive
+          }
           // All other cells remain in the same state.
           (otherwise, _) => otherwise,
         };
@@ -146,5 +169,6 @@ impl Universe {
       }
     }
     self.cells = next;
+    self.generation += 1;
   }
 }
