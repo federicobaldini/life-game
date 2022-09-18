@@ -1,8 +1,9 @@
 import init, { InitOutput, Universe, Cell } from "life-game";
 import { enableControlButton } from "./utils/control-button";
+import { enableResetButton } from "./utils/reset-button";
 import { enableMouseNavigation } from "./utils/mouse-navigation";
 
-let CELL_SIZE = 5; // px
+let CELL_SIZE = 10; // px
 const GRID_COLOR = "#494949";
 const DEAD_COLOR = "#494949";
 const ALIVE_COLOR = "#fdf8d8";
@@ -54,16 +55,8 @@ const drawCells = (
         cells[idx] === Cell.Dead ? DEAD_COLOR : ALIVE_COLOR;
 
       canvasContext.fillRect(
-        /*
-        With grid:
-        */
         col * (CELL_SIZE + 1) + 1,
         row * (CELL_SIZE + 1) + 1,
-        /*
-          Without grid:
-          col * CELL_SIZE,
-          row * CELL_SIZE,
-        */
         CELL_SIZE,
         CELL_SIZE
       );
@@ -74,69 +67,79 @@ const drawCells = (
 };
 
 init().then((wasm: InitOutput) => {
-  // Construct the universe, and get its width and height.
-  const universe: Universe = Universe.new(100, 100);
-  const width: number = universe.width();
-  const height: number = universe.height();
-  const playLife: { play: boolean } = { play: false };
-  let startPopulation: number = 0;
-  let maxPopulation: number = 0;
-  let score: number = 0;
-
   const lifeApplicationContainerElement: HTMLElement | null =
     document.getElementById("life-game__canvas-container");
   const lifeCanvasElement: HTMLCanvasElement | null = document.getElementById(
     "life-game__canvas"
   ) as HTMLCanvasElement | null;
-  const lifeStartPopulationElement: HTMLElement | null =
-    document.getElementById("life-game__start-population-data");
   const lifePopulationElement: HTMLElement | null = document.getElementById(
     "life-game__population-data"
   );
   const lifeGenerationElement: HTMLElement | null = document.getElementById(
     "life-game__generation-data"
   );
-  const lifePeakPopulationElement: HTMLElement | null = document.getElementById(
-    "life-game__peak-population-data"
-  );
-  const lifeScoreElement: HTMLElement | null = document.getElementById(
-    "life-game__score-data"
-  );
   const lifeControlButton: HTMLButtonElement | null = document.getElementById(
     "life-game__play-button"
   ) as HTMLButtonElement | null;
+  const lifeResetButton: HTMLButtonElement | null = document.getElementById(
+    "life-game__reset-button"
+  ) as HTMLButtonElement | null;
 
-  /*
-    With grid:
-  */
-  lifeCanvasElement.height = (CELL_SIZE + 1) * height + 1;
-  lifeCanvasElement.width = (CELL_SIZE + 1) * width + 1;
-  /*
-    Without grid:
-    lifeCanvasElement.height = CELL_SIZE * height;
-    lifeCanvasElement.width = CELL_SIZE * width;
-  */
-
-  if (lifeApplicationContainerElement) {
-    enableMouseNavigation(lifeApplicationContainerElement);
-  }
+  // Construct the universe, and get its width and height.
+  const universe: Universe = Universe.new(310, 310);
+  const universeWidth: number = universe.width();
+  const universeHeight: number = universe.height();
+  const playLife: { play: boolean } = { play: false };
+  let zoom: number = CELL_SIZE - 1;
 
   if (lifeCanvasElement) {
     const lifeCanvasContext: CanvasRenderingContext2D =
       lifeCanvasElement.getContext("2d");
 
+    lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
+    lifeCanvasElement.width = (CELL_SIZE + 1) * 310 + 1;
+
+    if (lifeApplicationContainerElement) {
+      enableMouseNavigation(lifeApplicationContainerElement);
+    }
+
     addEventListener("keypress", (event: KeyboardEvent) => {
       if (event.code === "BracketRight" || event.code === "Slash") {
         switch (event.code) {
           case "BracketRight":
-            CELL_SIZE += 1;
+            if (zoom + 1 <= 20) {
+              CELL_SIZE += 1;
+              zoom += 1;
+              lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
+              lifeCanvasElement.width = (CELL_SIZE + 1) * universeWidth + 1;
+
+              // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+              drawCells(
+                universe,
+                lifeCanvasContext,
+                wasm.memory,
+                universeWidth,
+                universeHeight
+              );
+            }
             break;
           case "Slash":
-            CELL_SIZE -= 1;
+            if (zoom - 1 >= 0) {
+              CELL_SIZE -= 1;
+              zoom -= 1;
+              lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
+              lifeCanvasElement.width = (CELL_SIZE + 1) * universeWidth + 1;
+              // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+              drawCells(
+                universe,
+                lifeCanvasContext,
+                wasm.memory,
+                universeWidth,
+                universeHeight
+              );
+            }
             break;
         }
-        lifeCanvasElement.height = (CELL_SIZE + 1) * height + 1;
-        lifeCanvasElement.width = (CELL_SIZE + 1) * width + 1;
       }
     });
 
@@ -146,22 +149,16 @@ init().then((wasm: InitOutput) => {
         lifePopulationElement.innerHTML = String(universe.population());
         lifeGenerationElement.innerHTML = String(universe.generation());
 
-        if (universe.generation() === 0) {
-          startPopulation = universe.population();
-          lifeStartPopulationElement.innerHTML = String(startPopulation);
-        }
-        if (universe.population() > maxPopulation) {
-          maxPopulation = universe.population();
-          lifePeakPopulationElement.innerHTML = String(maxPopulation);
-          lifeScoreElement.innerHTML = String(
-            (maxPopulation - startPopulation) * -1
-          );
-        }
-
         universe.update();
 
-        drawGrid(lifeCanvasContext, width, height);
-        drawCells(universe, lifeCanvasContext, wasm.memory, width, height);
+        // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+        drawCells(
+          universe,
+          lifeCanvasContext,
+          wasm.memory,
+          universeWidth,
+          universeHeight
+        );
 
         if (playLife.play) {
           requestAnimationFrame(renderLoop);
@@ -173,6 +170,20 @@ init().then((wasm: InitOutput) => {
 
     if (lifeControlButton) {
       enableControlButton(lifeControlButton, playLife, renderLoop);
+    }
+
+    if (lifeResetButton) {
+      enableResetButton(lifeResetButton, () => {
+        universe.reset();
+        // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+        drawCells(
+          universe,
+          lifeCanvasContext,
+          wasm.memory,
+          universeWidth,
+          universeHeight
+        );
+      });
     }
   }
 });
