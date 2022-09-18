@@ -14,9 +14,6 @@ export const enableMouseNavigation = (containerElement: HTMLElement): void => {
   const mouseUpHandler = function () {
     document.removeEventListener("mousemove", mouseMoveHandler);
     document.removeEventListener("mouseup", mouseUpHandler);
-
-    containerElement.style.cursor = "default";
-    containerElement.style.removeProperty("user-select");
   };
 
   const mouseDownHandler = (event: MouseEvent) => {
@@ -28,9 +25,6 @@ export const enableMouseNavigation = (containerElement: HTMLElement): void => {
       x: event.clientX,
       y: event.clientY,
     };
-
-    containerElement.style.cursor = "grabbing";
-    containerElement.style.userSelect = "none";
 
     document.addEventListener("mousemove", mouseMoveHandler);
     document.addEventListener("mouseup", mouseUpHandler);
