@@ -54,7 +54,6 @@
         align-items: center;
       }
       .life-game__canvas-container {
-        resize: both;
         width: 621px;
         height: 621px;
         border: 2px solid #bcbcbc;
@@ -64,8 +63,19 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        resize: both;
-        overflow: auto;
+      }
+      .life-game__actions-container {
+        position: fixed;
+        top: 50px;
+        right: 50px;
+        z-index: 2;
+        border-radius: 24px;
+        background: #3b3b3b;
+        padding: 16px 8px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: column;
       }
       .life-game__button {
         border: none;
@@ -84,6 +94,9 @@
         background: #474747;
         border: 1px solid #bcbcbc;
       }
+      .life-game__button:focus {
+        outline: none;
+      }
     </style>
   </head>
   <body>
@@ -92,20 +105,15 @@
       class="life-game__application-container"
     >
       <div class="life-game__data-container">
-        <label class="life-game__label">Start population:</label>
-        <div id="life-game__start-population-data" class="life-game__data">
-          0
-        </div>
         <label class="life-game__label">Population:</label>
         <div id="life-game__population-data" class="life-game__data">0</div>
         <label class="life-game__label">Generation:</label>
         <div id="life-game__generation-data" class="life-game__data">0</div>
-        <label class="life-game__label">Peak population:</label>
-        <div id="life-game__peak-population-data" class="life-game__data">
-          0
-        </div>
-        <label class="life-game__label">Best score:</label>
-        <div id="life-game__score-data" class="life-game__data">0</div>
+      </div>
+      <div id="life-game__canvas-container" class="life-game__canvas-container">
+        <canvas id="life-game__canvas" class="life-game__canvas"></canvas>
+      </div>
+      <div class="life-game__actions-container">
         <button
           id="life-game__play-button"
           class="life-game__button"
@@ -113,9 +121,13 @@
         >
           PLAY
         </button>
-      </div>
-      <div id="life-game__canvas-container" class="life-game__canvas-container">
-        <canvas id="life-game__canvas" class="life-game__canvas"></canvas>
+        <button
+          id="life-game__reset-button"
+          class="life-game__button"
+          type="button"
+        >
+          RESET
+        </button>
       </div>
     </div>
     <script src="./bootstrap.js"></script>
