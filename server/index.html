@@ -9,6 +9,8 @@
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        margin: 0;
+        background: #494949;
       }
       .life-game__application-container {
         top: 0;
@@ -20,7 +22,6 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        background: #494949;
         overflow: auto;
       }
       .life-game__data-container {
@@ -64,19 +65,6 @@
         justify-content: center;
         align-items: center;
       }
-      .life-game__actions-container {
-        position: fixed;
-        top: 50px;
-        right: 50px;
-        z-index: 2;
-        border-radius: 24px;
-        background: #3b3b3b;
-        padding: 16px 8px;
-        display: flex;
-        justify-content: flex-start;
-        align-items: flex-start;
-        flex-direction: column;
-      }
       .life-game__button {
         border: none;
         color: #bcbcbc;
@@ -109,11 +97,6 @@
         <div id="life-game__population-data" class="life-game__data">0</div>
         <label class="life-game__label">Generation:</label>
         <div id="life-game__generation-data" class="life-game__data">0</div>
-      </div>
-      <div id="life-game__canvas-container" class="life-game__canvas-container">
-        <canvas id="life-game__canvas" class="life-game__canvas"></canvas>
-      </div>
-      <div class="life-game__actions-container">
         <button
           id="life-game__play-button"
           class="life-game__button"
@@ -128,6 +111,9 @@
         >
           RESET
         </button>
+      </div>
+      <div id="life-game__canvas-container" class="life-game__canvas-container">
+        <canvas id="life-game__canvas" class="life-game__canvas"></canvas>
       </div>
     </div>
     <script src="./bootstrap.js"></script>
