@@ -1,1 +1,4 @@
 wasm-pack build --target web
+wasm-pack test --node
+wasm-pack test --firefox --headless
+wasm-pack test --chrome --headless
