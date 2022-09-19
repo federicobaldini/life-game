@@ -100,6 +100,22 @@ impl Universe {
     self.to_string()
   }
 
+  // Set the width of the universe.
+  //
+  // Resets all cells to the dead state.
+  pub fn set_width(&mut self, width: u32) {
+    self.width = width;
+    self.cells = (0..width * self.height).map(|_i| Cell::Dead).collect();
+  }
+
+  // Set the height of the universe.
+  //
+  // Resets all cells to the dead state.
+  pub fn set_height(&mut self, height: u32) {
+    self.height = height;
+    self.cells = (0..self.width * height).map(|_i| Cell::Dead).collect();
+  }
+
   // To access the cell at a given row and column, we translate the row and column into an
   // index into the cells vector
   fn get_index(&self, row: u32, column: u32) -> usize {
@@ -175,5 +191,24 @@ impl Universe {
   pub fn reset(&mut self) {
     self.cells = (0..self.width * self.height).map(|_| Cell::Dead).collect();
     self.population = 0;
+  }
+}
+
+// Created another impl Universe block inside the wasm_game_of_life/src/lib.rs file without
+// the #[wasm_bindgen] attribute.
+// There are a few functions that have to be tested and they have not to be exposed to the JavaScript.
+impl Universe {
+  /// Get the dead and alive values of the entire universe.
+  pub fn get_cells(&self) -> &[Cell] {
+    &self.cells
+  }
+
+  /// Set cells to be alive in a universe by passing the row and column
+  /// of each cell as an array.
+  pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
+    for (row, col) in cells.iter().cloned() {
+      let idx = self.get_index(row, col);
+      self.cells[idx] = Cell::Alive;
+    }
   }
 }
