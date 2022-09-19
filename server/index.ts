@@ -2,6 +2,7 @@ import init, { InitOutput, Universe, Cell } from "life-game";
 import { enableControlButton } from "./utils/control-button";
 import { enableResetButton } from "./utils/reset-button";
 import { enableMouseNavigation } from "./utils/mouse-navigation";
+import { enableZoom } from "./utils/zoom-control";
 
 let CELL_SIZE = 10; // px
 const GRID_COLOR = "#494949";
@@ -103,45 +104,32 @@ init().then((wasm: InitOutput) => {
       enableMouseNavigation(lifeApplicationContainerElement);
     }
 
-    addEventListener("keypress", (event: KeyboardEvent) => {
-      if (event.code === "BracketRight" || event.code === "Slash") {
-        switch (event.code) {
-          case "BracketRight":
-            if (zoom + 1 <= 20) {
-              CELL_SIZE += 1;
-              zoom += 1;
-              lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
-              lifeCanvasElement.width = (CELL_SIZE + 1) * universeWidth + 1;
-
-              // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
-              drawCells(
-                universe,
-                lifeCanvasContext,
-                wasm.memory,
-                universeWidth,
-                universeHeight
-              );
-            }
-            break;
-          case "Slash":
-            if (zoom - 1 >= 0) {
-              CELL_SIZE -= 1;
-              zoom -= 1;
-              lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
-              lifeCanvasElement.width = (CELL_SIZE + 1) * universeWidth + 1;
-              // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
-              drawCells(
-                universe,
-                lifeCanvasContext,
-                wasm.memory,
-                universeWidth,
-                universeHeight
-              );
-            }
-            break;
+    enableZoom(
+      () => {
+        if (zoom + 1 <= 20) {
+          CELL_SIZE += 1;
+          zoom += 1;
         }
+      },
+      () => {
+        if (zoom - 1 >= 0) {
+          CELL_SIZE -= 1;
+          zoom -= 1;
+        }
+      },
+      () => {
+        lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
+        lifeCanvasElement.width = (CELL_SIZE + 1) * universeWidth + 1;
+        // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+        drawCells(
+          universe,
+          lifeCanvasContext,
+          wasm.memory,
+          universeWidth,
+          universeHeight
+        );
       }
-    });
+    );
 
     const renderLoop = () => {
       const frame_per_second: number = 10;
