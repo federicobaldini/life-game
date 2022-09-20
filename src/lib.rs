@@ -13,6 +13,15 @@ pub enum Cell {
   Alive = 1,
 }
 
+impl Cell {
+  fn toggle(&mut self) {
+    *self = match *self {
+      Cell::Dead => Cell::Alive,
+      Cell::Alive => Cell::Dead,
+    };
+  }
+}
+
 // The universe has a width and a height, and a vector of cells of length width * height.
 #[wasm_bindgen]
 pub struct Universe {
@@ -55,6 +64,7 @@ impl fmt::Display for Universe {
 impl Universe {
   // constructor that initializes the universe with an interesting pattern of live and dead cells
   pub fn new(width: u32, height: u32) -> Universe {
+    /*
     let mut population = 0;
     let cells = (0..width * height)
       .map(|i| {
@@ -66,12 +76,14 @@ impl Universe {
         }
       })
       .collect();
+    */
+    let cells = (0..width * height).map(|_| Cell::Dead).collect();
 
     Universe {
       width,
       height,
       cells,
-      population,
+      population: 0,
       generation: 0,
     }
   }
@@ -159,7 +171,9 @@ impl Universe {
           // Rule 1: Any live cell with fewer than two live neighbours
           // dies, as if caused by underpopulation.
           (Cell::Alive, x) if x < 2 => {
-            self.population -= 1;
+            if self.population > 1 {
+              self.population -= 1;
+            }
             Cell::Dead
           }
           // Rule 2: Any live cell with two or three live neighbours
@@ -168,7 +182,9 @@ impl Universe {
           // Rule 3: Any live cell with more than three live
           // neighbours dies, as if by overpopulation.
           (Cell::Alive, x) if x > 3 => {
-            self.population -= 1;
+            if self.population > 1 {
+              self.population -= 1
+            };
             Cell::Dead
           }
           // Rule 4: Any dead cell with exactly three live neighbours
@@ -192,6 +208,11 @@ impl Universe {
     self.cells = (0..self.width * self.height).map(|_| Cell::Dead).collect();
     self.population = 0;
     self.generation = 0;
+  }
+
+  pub fn toggle_cell(&mut self, row: u32, column: u32) {
+    let cell_index = self.get_index(row, column);
+    self.cells[cell_index].toggle();
   }
 }
 
