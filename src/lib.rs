@@ -191,6 +191,7 @@ impl Universe {
   pub fn reset(&mut self) {
     self.cells = (0..self.width * self.height).map(|_| Cell::Dead).collect();
     self.population = 0;
+    self.generation = 0;
   }
 }
 
