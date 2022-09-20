@@ -95,8 +95,7 @@ init().then((wasm: InitOutput) => {
   let animationId: number | null = null;
   let mooving: boolean = false;
 
-  const setMooving = (event: MouseEvent): void => {
-    console.log("OK");
+  const setMooving = (): void => {
     mooving = true;
   };
 
