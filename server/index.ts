@@ -90,8 +90,9 @@ init().then((wasm: InitOutput) => {
   const universe: Universe = Universe.new(310, 310);
   const universeWidth: number = universe.width();
   const universeHeight: number = universe.height();
-  const playLife: { play: boolean } = { play: false };
+  const gameStatus: { play: boolean } = { play: false };
   let zoom: number = CELL_SIZE - 1;
+  let animationId: number | null = null
 
   if (lifeCanvasElement) {
     const lifeCanvasContext: CanvasRenderingContext2D =
@@ -148,8 +149,8 @@ init().then((wasm: InitOutput) => {
           universeHeight
         );
 
-        if (playLife.play) {
-          requestAnimationFrame(renderLoop);
+        if (gameStatus.play) {
+          animationId = requestAnimationFrame(renderLoop);
         }
       }, 1000 / frame_per_second);
     };
@@ -157,12 +158,14 @@ init().then((wasm: InitOutput) => {
     requestAnimationFrame(renderLoop);
 
     if (lifeControlButton) {
-      enableControlButton(lifeControlButton, playLife, renderLoop);
+      enableControlButton(lifeControlButton, gameStatus, animationId, renderLoop);
     }
 
     if (lifeResetButton) {
       enableResetButton(lifeResetButton, () => {
         universe.reset();
+        lifePopulationElement.innerHTML = String(universe.population());
+        lifeGenerationElement.innerHTML = String(universe.generation());
         // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
         drawCells(
           universe,
