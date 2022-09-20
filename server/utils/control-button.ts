@@ -1,15 +1,17 @@
 export const enableControlButton = (
   buttonElement: HTMLButtonElement,
-  playElement: { play: boolean },
-  callback: Function
+  gameStatus: { play: boolean },
+  animationId: number | null,
+  renderLoopCallback: Function
 ): void => {
   buttonElement.addEventListener("click", (_) => {
-    if (playElement.play) {
-      playElement.play = false;
+    if (gameStatus.play) {
+      cancelAnimationFrame(animationId);
+      gameStatus.play = false;
       buttonElement.textContent = "RESUME";
     } else {
-      callback();
-      playElement.play = true;
+      renderLoopCallback();
+      gameStatus.play = true;
       buttonElement.textContent = "STOP";
     }
   });
