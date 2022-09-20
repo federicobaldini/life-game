@@ -101,6 +101,30 @@ init().then((wasm: InitOutput) => {
     lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
     lifeCanvasElement.width = (CELL_SIZE + 1) * 310 + 1;
 
+    lifeCanvasElement.addEventListener("click", (event: MouseEvent) => {
+      const boundingRect = lifeCanvasElement.getBoundingClientRect();
+    
+      const scaleX = lifeCanvasElement.width / boundingRect.width;
+      const scaleY = lifeCanvasElement.height / boundingRect.height;
+    
+      const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
+      const canvasTop = (event.clientY - boundingRect.top) * scaleY;
+    
+      const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), universeHeight - 1);
+      const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), universeWidth - 1);
+    
+      universe.toggle_cell(row, col);
+    
+        // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+        drawCells(
+          universe,
+          lifeCanvasContext,
+          wasm.memory,
+          universeWidth,
+          universeHeight
+        );
+    });
+
     if (lifeApplicationContainerElement) {
       enableMouseNavigation(lifeApplicationContainerElement);
     }
