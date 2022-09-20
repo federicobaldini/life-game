@@ -92,7 +92,13 @@ init().then((wasm: InitOutput) => {
   const universeHeight: number = universe.height();
   const gameStatus: { play: boolean } = { play: false };
   let zoom: number = CELL_SIZE - 1;
-  let animationId: number | null = null
+  let animationId: number | null = null;
+  let mooving: boolean = false;
+
+  const setMooving = (event: MouseEvent): void => {
+    console.log("OK");
+    mooving = true;
+  };
 
   if (lifeCanvasElement) {
     const lifeCanvasContext: CanvasRenderingContext2D =
@@ -101,20 +107,31 @@ init().then((wasm: InitOutput) => {
     lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
     lifeCanvasElement.width = (CELL_SIZE + 1) * 310 + 1;
 
-    lifeCanvasElement.addEventListener("click", (event: MouseEvent) => {
-      const boundingRect = lifeCanvasElement.getBoundingClientRect();
-    
-      const scaleX = lifeCanvasElement.width / boundingRect.width;
-      const scaleY = lifeCanvasElement.height / boundingRect.height;
-    
-      const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
-      const canvasTop = (event.clientY - boundingRect.top) * scaleY;
-    
-      const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), universeHeight - 1);
-      const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), universeWidth - 1);
-    
-      universe.toggle_cell(row, col);
-    
+    lifeCanvasElement.addEventListener("mousedown", () => {
+      lifeCanvasElement.addEventListener("mousemove", setMooving);
+    });
+
+    lifeCanvasElement.addEventListener("mouseup", (event: MouseEvent) => {
+      if (!mooving) {
+        const boundingRect = lifeCanvasElement.getBoundingClientRect();
+
+        const scaleX = lifeCanvasElement.width / boundingRect.width;
+        const scaleY = lifeCanvasElement.height / boundingRect.height;
+
+        const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
+        const canvasTop = (event.clientY - boundingRect.top) * scaleY;
+
+        const row = Math.min(
+          Math.floor(canvasTop / (CELL_SIZE + 1)),
+          universeHeight - 1
+        );
+        const col = Math.min(
+          Math.floor(canvasLeft / (CELL_SIZE + 1)),
+          universeWidth - 1
+        );
+
+        universe.toggle_cell(row, col);
+
         // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
         drawCells(
           universe,
@@ -123,6 +140,9 @@ init().then((wasm: InitOutput) => {
           universeWidth,
           universeHeight
         );
+      }
+      mooving = false;
+      lifeCanvasElement.removeEventListener("mousemove", setMooving);
     });
 
     if (lifeApplicationContainerElement) {
@@ -157,7 +177,7 @@ init().then((wasm: InitOutput) => {
     );
 
     const renderLoop = () => {
-      const frame_per_second: number = 10;
+      const frame_per_second: number = 30;
       setTimeout(() => {
         lifePopulationElement.innerHTML = String(universe.population());
         lifeGenerationElement.innerHTML = String(universe.generation());
@@ -182,7 +202,12 @@ init().then((wasm: InitOutput) => {
     requestAnimationFrame(renderLoop);
 
     if (lifeControlButton) {
-      enableControlButton(lifeControlButton, gameStatus, animationId, renderLoop);
+      enableControlButton(
+        lifeControlButton,
+        gameStatus,
+        animationId,
+        renderLoop
+      );
     }
 
     if (lifeResetButton) {
