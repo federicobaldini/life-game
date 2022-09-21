@@ -4,7 +4,7 @@ import { enableResetButton } from "./utils/reset-button";
 import { enableMouseNavigation } from "./utils/mouse-navigation";
 import { enableZoom } from "./utils/zoom-control";
 
-let CELL_SIZE = 10; // px
+let CELL_SIZE = 30; // px
 const GRID_COLOR = "#494949";
 const DEAD_COLOR = "#494949";
 const ALIVE_COLOR = "#fdf8d8";
@@ -94,9 +94,16 @@ init().then((wasm: InitOutput) => {
   let zoom: number = CELL_SIZE - 1;
   let animationId: number | null = null;
   let mooving: boolean = false;
+  let initialCursorPositionX: number = 0;
+  let initialCursorPositionY: number = 0;
 
-  const setMooving = (): void => {
-    mooving = true;
+  const setMooving = (event: MouseEvent): void => {
+    if (
+      Math.abs(event.clientX - initialCursorPositionX) > 20 ||
+      Math.abs(event.clientY - initialCursorPositionY) > 20
+    ) {
+      mooving = true;
+    }
   };
 
   if (lifeCanvasElement) {
@@ -106,7 +113,9 @@ init().then((wasm: InitOutput) => {
     lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
     lifeCanvasElement.width = (CELL_SIZE + 1) * 310 + 1;
 
-    lifeCanvasElement.addEventListener("mousedown", () => {
+    lifeCanvasElement.addEventListener("mousedown", (event: MouseEvent) => {
+      initialCursorPositionX = event.clientX;
+      initialCursorPositionY = event.clientY;
       lifeCanvasElement.addEventListener("mousemove", setMooving);
     });
 
@@ -150,7 +159,7 @@ init().then((wasm: InitOutput) => {
 
     enableZoom(
       () => {
-        if (zoom + 1 <= 20) {
+        if (zoom + 1 <= 30) {
           CELL_SIZE += 1;
           zoom += 1;
         }
