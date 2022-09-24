@@ -1,6 +1,10 @@
 use std::fmt;
 use wasm_bindgen::prelude::*;
-// use wee_alloc::WeeAlloc;
+
+#[wasm_bindgen(module = "/server/utils/random.ts")]
+extern "C" {
+  fn randomNumber(max: usize) -> usize;
+}
 
 // It is important that we have #[repr(u8)], so that each cell is represented as a single byte.
 // It is also important that the Dead variant is 0 and that the Alive variant is 1,
@@ -213,6 +217,21 @@ impl Universe {
   pub fn toggle_cell(&mut self, row: u32, column: u32) {
     let cell_index = self.get_index(row, column);
     self.cells[cell_index].toggle();
+  }
+
+  pub fn random(&mut self, density: usize) {
+    self.population = 0;
+    self.generation = 0;
+    self.cells = (0..self.width * self.height)
+      .map(|_| {
+        if randomNumber(100) < density {
+          self.population += 1;
+          Cell::Alive
+        } else {
+          Cell::Dead
+        }
+      })
+      .collect();
   }
 }
 
