@@ -4,7 +4,7 @@ import { enableResetButton } from "./utils/reset-button";
 import { enableMouseNavigation } from "./utils/mouse-navigation";
 import { enableZoom } from "./utils/zoom-control";
 
-let CELL_SIZE = 30; // px
+let CELL_SIZE = 1; // px
 const GRID_COLOR = "#494949";
 const DEAD_COLOR = "#494949";
 const ALIVE_COLOR = "#fdf8d8";
@@ -85,13 +85,17 @@ init().then((wasm: InitOutput) => {
   const lifeResetButton: HTMLButtonElement | null = document.getElementById(
     "life-game__reset-button"
   ) as HTMLButtonElement | null;
+  const lifeRandomButton: HTMLButtonElement | null = document.getElementById(
+    "life-game__random-button"
+  ) as HTMLButtonElement | null;
 
   // Construct the universe, and get its width and height.
   const universe: Universe = Universe.new(310, 310);
+  universe.random(20);
   const universeWidth: number = universe.width();
   const universeHeight: number = universe.height();
   const gameStatus: { play: boolean } = { play: false };
-  let zoom: number = CELL_SIZE - 1;
+  let zoom: number = 0; // CELL_SIZE - 1;
   let animationId: number | null = null;
   let mooving: boolean = false;
   let initialCursorPositionX: number = 0;
@@ -233,5 +237,22 @@ init().then((wasm: InitOutput) => {
         );
       });
     }
+
+    lifeRandomButton.addEventListener("click", () => {
+      cancelAnimationFrame(animationId);
+      gameStatus.play = false;
+      lifeControlButton.textContent = "RESUME";
+      universe.random(20);
+      lifePopulationElement.innerHTML = String(universe.population());
+      lifeGenerationElement.innerHTML = String(universe.generation());
+      // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+      drawCells(
+        universe,
+        lifeCanvasContext,
+        wasm.memory,
+        universeWidth,
+        universeHeight
+      );
+    });
   }
 });
