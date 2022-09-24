@@ -68,19 +68,6 @@ impl fmt::Display for Universe {
 impl Universe {
   // constructor that initializes the universe with an interesting pattern of live and dead cells
   pub fn new(width: u32, height: u32) -> Universe {
-    /*
-    let mut population = 0;
-    let cells = (0..width * height)
-      .map(|i| {
-        if i % 2 == 0 || i % 7 == 0 {
-          population += 1;
-          Cell::Alive
-        } else {
-          Cell::Dead
-        }
-      })
-      .collect();
-    */
     let cells = (0..width * height).map(|_| Cell::Dead).collect();
 
     Universe {
