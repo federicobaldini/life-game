@@ -3,12 +3,12 @@ export const enableMouseNavigation = (containerElement: HTMLElement): void => {
 
   const mouseMoveHandler = function (event: MouseEvent) {
     // How far the mouse has been moved
-    const dx = event.clientX - pos.x;
-    const dy = event.clientY - pos.y;
+    const dx = event.pageX - pos.x;
+    const dy = event.pageY - pos.y;
 
     // Scroll the element
-    containerElement.scrollTop = pos.top - dy;
-    containerElement.scrollLeft = pos.left - dx;
+    containerElement.style.top = `${pos.top + dy}px`;
+    containerElement.style.left = `${pos.left + dx}px`;
   };
 
   const mouseUpHandler = function () {
@@ -17,13 +17,14 @@ export const enableMouseNavigation = (containerElement: HTMLElement): void => {
   };
 
   const mouseDownHandler = (event: MouseEvent) => {
+    console.log();
     pos = {
       // The current scroll
-      left: containerElement.scrollLeft,
-      top: containerElement.scrollTop,
+      left: containerElement.offsetLeft,
+      top: containerElement.offsetTop,
       // Get the current mouse position
-      x: event.clientX,
-      y: event.clientY,
+      x: event.pageX,
+      y: event.pageY,
     };
 
     document.addEventListener("mousemove", mouseMoveHandler);
@@ -31,4 +32,10 @@ export const enableMouseNavigation = (containerElement: HTMLElement): void => {
   };
 
   document.addEventListener("mousedown", mouseDownHandler);
+  document.addEventListener("keypress", (event: KeyboardEvent): void => {
+    if (event.code === "Space") {
+      containerElement.style.top = "10px";
+      containerElement.style.left = "10px";
+    }
+  });
 };
