@@ -206,19 +206,22 @@ impl Universe {
     self.cells[cell_index].toggle();
   }
 
+  // "density" must be between 0 and 100
   pub fn random(&mut self, density: usize) {
-    self.population = 0;
-    self.generation = 0;
-    self.cells = (0..self.width * self.height)
-      .map(|_| {
-        if randomNumber(100) < density {
-          self.population += 1;
-          Cell::Alive
-        } else {
-          Cell::Dead
-        }
-      })
-      .collect();
+    if density <= 100 {
+      self.population = 0;
+      self.generation = 0;
+      self.cells = (0..self.width * self.height)
+        .map(|_| {
+          if randomNumber(100) < density {
+            self.population += 1;
+            Cell::Alive
+          } else {
+            Cell::Dead
+          }
+        })
+        .collect()
+    };
   }
 }
 
