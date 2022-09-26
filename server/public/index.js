@@ -6,27 +6,30 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-/******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
-
-/***/ "./index.js":
-/*!******************!*\
+/******/ ((): void => {
+  // webpackBootstrap
+  /******/ var __webpack_modules__ = {
+    /***/ "./index.js":
+      /*!******************!*\
   !*** ./index.js ***!
   \******************/
-/***/ (() => {
+      /***/ (): void => {
+        eval(
+          "async function init() {\n  const byteArray = new Int8Array([\n    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x07, 0x01, 0x60,\n    0x02, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x02, 0x01, 0x00, 0x07, 0x07, 0x01,\n    0x03, 0x73, 0x75, 0x6d, 0x00, 0x00, 0x0a, 0x09, 0x01, 0x07, 0x00, 0x20,\n    0x00, 0x20, 0x01, 0x6a, 0x0b, 0x00, 0x18, 0x04, 0x6e, 0x61, 0x6d, 0x65,\n    0x01, 0x06, 0x01, 0x00, 0x03, 0x73, 0x75, 0x6d, 0x02, 0x09, 0x01, 0x00,\n    0x02, 0x00, 0x01, 0x61, 0x01, 0x01, 0x62,\n  ]);\n  const wasm = await WebAssembly.instantiate(byteArray.buffer);\n  const sumFunction = wasm.instance.exports.sum;\n  const result = sumFunction(100, 1000);\n  console.log(result);\n}\n\ninit();\n\n\n//# sourceURL=webpack://server/./index.js?"
+        );
 
-eval("async function init() {\n  const byteArray = new Int8Array([\n    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x07, 0x01, 0x60,\n    0x02, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x02, 0x01, 0x00, 0x07, 0x07, 0x01,\n    0x03, 0x73, 0x75, 0x6d, 0x00, 0x00, 0x0a, 0x09, 0x01, 0x07, 0x00, 0x20,\n    0x00, 0x20, 0x01, 0x6a, 0x0b, 0x00, 0x18, 0x04, 0x6e, 0x61, 0x6d, 0x65,\n    0x01, 0x06, 0x01, 0x00, 0x03, 0x73, 0x75, 0x6d, 0x02, 0x09, 0x01, 0x00,\n    0x02, 0x00, 0x01, 0x61, 0x01, 0x01, 0x62,\n  ]);\n  const wasm = await WebAssembly.instantiate(byteArray.buffer);\n  const sumFunction = wasm.instance.exports.sum;\n  const result = sumFunction(100, 1000);\n  console.log(result);\n}\n\ninit();\n\n\n//# sourceURL=webpack://server/./index.js?");
+        /***/
+      },
 
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = {};
-/******/ 	__webpack_modules__["./index.js"]();
-/******/ 	
-/******/ })()
-;
+    /******/
+  };
+  /************************************************************************/
+  /******/
+  /******/ // startup
+  /******/ // Load entry module and return exports
+  /******/ // This entry module can't be inlined because the eval devtool is used.
+  /******/ var __webpack_exports__ = {};
+  /******/ __webpack_modules__["./index.js"]();
+  /******/
+  /******/
+})();
