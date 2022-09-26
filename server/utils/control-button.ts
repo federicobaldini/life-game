@@ -2,7 +2,7 @@ export const enableControlButton = (
   buttonElement: HTMLButtonElement,
   gameStatus: { play: boolean },
   animationId: number | null,
-  renderLoopCallback: Function
+  renderLoopCallback: () => void
 ): void => {
   buttonElement.addEventListener("click", (_) => {
     if (gameStatus.play) {
