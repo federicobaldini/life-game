@@ -1,8 +1,8 @@
 export const enableResetButton = (
   buttonElement: HTMLButtonElement,
-  callback: Function
+  resetCallback: () => void
 ): void => {
   buttonElement.addEventListener("click", (_) => {
-    callback();
+    resetCallback();
   });
 };
