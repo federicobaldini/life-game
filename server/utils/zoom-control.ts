@@ -1,7 +1,7 @@
 export const enableZoom = (
-  zoomInFunction: Function,
-  zoomOutFunction: Function,
-  drawChange: Function
+  zoomInFunction: () => void,
+  zoomOutFunction: () => void,
+  drawChange: () => void
 ): void => {
   addEventListener("keypress", (event: KeyboardEvent) => {
     if (event.code === "BracketRight" || event.code === "Slash") {
