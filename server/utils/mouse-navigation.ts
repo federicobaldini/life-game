@@ -1,4 +1,7 @@
-export const enableMouseNavigation = (containerElement: HTMLElement): void => {
+export const enableMouseNavigation = (
+  canvasElement: HTMLElement,
+  spaceCallback: () => void
+): void => {
   let pos = { top: 0, left: 0, x: 0, y: 0 };
 
   const mouseMoveHandler = function (event: MouseEvent) {
@@ -7,8 +10,8 @@ export const enableMouseNavigation = (containerElement: HTMLElement): void => {
     const dy = event.pageY - pos.y;
 
     // Scroll the element
-    containerElement.style.top = `${pos.top + dy}px`;
-    containerElement.style.left = `${pos.left + dx}px`;
+    canvasElement.style.top = `${pos.top + dy}px`;
+    canvasElement.style.left = `${pos.left + dx}px`;
   };
 
   const mouseUpHandler = function () {
@@ -20,8 +23,8 @@ export const enableMouseNavigation = (containerElement: HTMLElement): void => {
     console.log();
     pos = {
       // The current scroll
-      left: containerElement.offsetLeft,
-      top: containerElement.offsetTop,
+      left: canvasElement.offsetLeft,
+      top: canvasElement.offsetTop,
       // Get the current mouse position
       x: event.pageX,
       y: event.pageY,
@@ -34,8 +37,7 @@ export const enableMouseNavigation = (containerElement: HTMLElement): void => {
   document.addEventListener("mousedown", mouseDownHandler);
   document.addEventListener("keypress", (event: KeyboardEvent): void => {
     if (event.code === "Space") {
-      containerElement.style.top = "10px";
-      containerElement.style.left = "10px";
+      spaceCallback();
     }
   });
 };
