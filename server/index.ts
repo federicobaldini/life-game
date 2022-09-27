@@ -4,7 +4,7 @@ import { enableResetButton } from "./utils/reset-button";
 import { enableMouseNavigation } from "./utils/mouse-navigation";
 import { enableZoom } from "./utils/zoom-control";
 
-let CELL_SIZE = 1; // px
+let cell_size = 1; // px
 const GRID_COLOR = "#494949";
 const DEAD_COLOR = "#494949";
 const ALIVE_COLOR = "#fdf8d8";
@@ -19,14 +19,14 @@ const drawGrid = (
 
   // Vertical lines.
   for (let i = 0; i <= width; i++) {
-    canvasContext.moveTo(i * (CELL_SIZE + 1) + 1, 0);
-    canvasContext.lineTo(i * (CELL_SIZE + 1) + 1, (CELL_SIZE + 1) * height + 1);
+    canvasContext.moveTo(i * (cell_size + 1) + 1, 0);
+    canvasContext.lineTo(i * (cell_size + 1) + 1, (cell_size + 1) * height + 1);
   }
 
   // Horizontal lines.
   for (let j = 0; j <= height; j++) {
-    canvasContext.moveTo(0, j * (CELL_SIZE + 1) + 1);
-    canvasContext.lineTo((CELL_SIZE + 1) * width + 1, j * (CELL_SIZE + 1) + 1);
+    canvasContext.moveTo(0, j * (cell_size + 1) + 1);
+    canvasContext.lineTo((cell_size + 1) * width + 1, j * (cell_size + 1) + 1);
   }
 
   canvasContext.stroke();
@@ -56,10 +56,10 @@ const drawCells = (
         cells[idx] === Cell.Dead ? DEAD_COLOR : ALIVE_COLOR;
 
       canvasContext.fillRect(
-        col * (CELL_SIZE + 1) + 1,
-        row * (CELL_SIZE + 1) + 1,
-        CELL_SIZE,
-        CELL_SIZE
+        col * (cell_size + 1) + 1,
+        row * (cell_size + 1) + 1,
+        cell_size,
+        cell_size
       );
     }
   }
@@ -68,8 +68,6 @@ const drawCells = (
 };
 
 init().then((wasm: InitOutput) => {
-  const lifeApplicationContainerElement: HTMLElement | null =
-    document.getElementById("life-game__canvas-container");
   const lifeCanvasElement: HTMLCanvasElement | null = document.getElementById(
     "life-game__canvas"
   ) as HTMLCanvasElement | null;
@@ -95,11 +93,21 @@ init().then((wasm: InitOutput) => {
   const universeWidth: number = universe.width();
   const universeHeight: number = universe.height();
   const gameStatus: { play: boolean } = { play: false };
-  let zoom: number = 0; // CELL_SIZE - 1;
+  let zoom: number = cell_size - 1;
   let animationId: number | null = null;
   let mooving: boolean = false;
   let initialCursorPositionX: number = 0;
   let initialCursorPositionY: number = 0;
+  let initialCanvasPositionX: number = 0;
+  let initialCanvasPositionY: number = 0;
+  let latestCanvasPositionX: number = lifeCanvasElement.offsetTop;
+  let latestCanvasPositionY: number = lifeCanvasElement.offsetLeft;
+  let noNewPopulationCounter: number = 0;
+  let prevPopulation: number = 0;
+  let peakPopulation: number = 0;
+  let peakGeneration: number = 0;
+  let incrementZoomX: number = 0;
+  let incrementZoomY: number = 0;
 
   const setMooving = (event: MouseEvent): void => {
     if (
@@ -114,16 +122,29 @@ init().then((wasm: InitOutput) => {
     const lifeCanvasContext: CanvasRenderingContext2D =
       lifeCanvasElement.getContext("2d");
 
-    lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
-    lifeCanvasElement.width = (CELL_SIZE + 1) * 310 + 1;
+    lifeCanvasElement.height = (cell_size + 1) * universeHeight + 1;
+    lifeCanvasElement.width = (cell_size + 1) * 310 + 1;
 
-    lifeCanvasElement.addEventListener("mousedown", (event: MouseEvent) => {
+    lifePopulationElement.textContent = String(universe.population());
+    lifeGenerationElement.textContent = String(universe.generation());
+    peakPopulation = universe.population();
+
+    // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+    drawCells(
+      universe,
+      lifeCanvasContext,
+      wasm.memory,
+      universeWidth,
+      universeHeight
+    );
+
+    document.addEventListener("mousedown", (event: MouseEvent) => {
       initialCursorPositionX = event.clientX;
       initialCursorPositionY = event.clientY;
-      lifeCanvasElement.addEventListener("mousemove", setMooving);
+      document.addEventListener("mousemove", setMooving);
     });
 
-    lifeCanvasElement.addEventListener("mouseup", (event: MouseEvent) => {
+    document.addEventListener("mouseup", (event: MouseEvent) => {
       if (!mooving) {
         const boundingRect = lifeCanvasElement.getBoundingClientRect();
 
@@ -134,11 +155,11 @@ init().then((wasm: InitOutput) => {
         const canvasTop = (event.clientY - boundingRect.top) * scaleY;
 
         const row = Math.min(
-          Math.floor(canvasTop / (CELL_SIZE + 1)),
+          Math.floor(canvasTop / (cell_size + 1)),
           universeHeight - 1
         );
         const col = Math.min(
-          Math.floor(canvasLeft / (CELL_SIZE + 1)),
+          Math.floor(canvasLeft / (cell_size + 1)),
           universeWidth - 1
         );
 
@@ -154,29 +175,91 @@ init().then((wasm: InitOutput) => {
         );
       }
       mooving = false;
-      lifeCanvasElement.removeEventListener("mousemove", setMooving);
+      document.removeEventListener("mousemove", setMooving);
     });
 
-    if (lifeApplicationContainerElement) {
-      enableMouseNavigation(lifeApplicationContainerElement);
-    }
+    const renderLoop = (): void => {
+      const frame_per_second: number = 30;
+      setTimeout((): void => {
+        lifePopulationElement.textContent = String(universe.population());
+        lifeGenerationElement.textContent = String(universe.generation());
+        prevPopulation = universe.population();
+
+        universe.update();
+
+        if (prevPopulation === universe.population()) {
+          noNewPopulationCounter += 1;
+        } else {
+          noNewPopulationCounter = 0;
+        }
+
+        if (universe.population() > peakPopulation) {
+          peakPopulation = universe.population();
+          peakGeneration = universe.generation();
+        }
+
+        // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
+        drawCells(
+          universe,
+          lifeCanvasContext,
+          wasm.memory,
+          universeWidth,
+          universeHeight
+        );
+
+        if (gameStatus.play && noNewPopulationCounter < 10) {
+          animationId = requestAnimationFrame(renderLoop);
+        } else if (noNewPopulationCounter >= 10) {
+          gameStatus.play = false;
+          lifeControlButton.textContent = "PLAY";
+          noNewPopulationCounter = 0;
+          prevPopulation = 0;
+          console.log("Peak population:", peakPopulation);
+          console.log("Peak generation:", peakGeneration);
+          peakPopulation = 0;
+          peakGeneration = 0;
+        }
+      }, 1000 / frame_per_second);
+    };
 
     enableZoom(
-      () => {
+      (): void => {
         if (zoom + 1 <= 30) {
-          CELL_SIZE += 1;
+          cell_size += 1;
           zoom += 1;
+          latestCanvasPositionX = lifeCanvasElement.offsetLeft;
+          latestCanvasPositionY = lifeCanvasElement.offsetTop;
+
+          incrementZoomX = (universeWidth - initialCanvasPositionX) / 2;
+          incrementZoomY = (universeHeight - initialCanvasPositionY) / 2;
+
+          latestCanvasPositionX = latestCanvasPositionX - incrementZoomX;
+          latestCanvasPositionY = latestCanvasPositionY - incrementZoomY;
+
+          lifeCanvasElement.style.top = `${latestCanvasPositionY}px`;
+          lifeCanvasElement.style.left = `${latestCanvasPositionX}px`;
         }
       },
-      () => {
+      (): void => {
         if (zoom - 1 >= 0) {
-          CELL_SIZE -= 1;
+          cell_size -= 1;
           zoom -= 1;
+          latestCanvasPositionX = lifeCanvasElement.offsetLeft;
+          latestCanvasPositionY = lifeCanvasElement.offsetTop;
+
+          incrementZoomX = (universeWidth - initialCanvasPositionX) / 2;
+          incrementZoomY = (universeHeight - initialCanvasPositionY) / 2;
+
+          latestCanvasPositionX = latestCanvasPositionX + incrementZoomX;
+          latestCanvasPositionY = latestCanvasPositionY + incrementZoomY;
+
+          lifeCanvasElement.style.top = `${latestCanvasPositionY}px`;
+          lifeCanvasElement.style.left = `${latestCanvasPositionX}px`;
         }
       },
-      () => {
-        lifeCanvasElement.height = (CELL_SIZE + 1) * universeHeight + 1;
-        lifeCanvasElement.width = (CELL_SIZE + 1) * universeWidth + 1;
+      (): void => {
+        lifeCanvasElement.height = (cell_size + 1) * universeHeight + 1;
+        lifeCanvasElement.width = (cell_size + 1) * universeWidth + 1;
         // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
         drawCells(
           universe,
@@ -188,14 +271,22 @@ init().then((wasm: InitOutput) => {
       }
     );
 
-    const renderLoop = () => {
-      const frame_per_second: number = 30;
-      setTimeout(() => {
-        lifePopulationElement.innerHTML = String(universe.population());
-        lifeGenerationElement.innerHTML = String(universe.generation());
-
-        universe.update();
-
+    /*
+    It has to be improved, if you zoom in and then move the canvas, zoom in and zoom out don't work
+    if (lifeCanvasElement) {
+      enableMouseNavigation(lifeCanvasElement, (): void => {
+        lifeCanvasElement.style.top = "0px";
+        lifeCanvasElement.style.left = "0px";
+        initialCanvasPositionX = 0;
+        initialCanvasPositionY = 0;
+        zoom = 0;
+        cell_size = 1;
+        lifeCanvasContext.clearRect(
+          0,
+          0,
+          lifeCanvasElement.width,
+          lifeCanvasElement.height
+        );
         // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
         drawCells(
           universe,
@@ -204,14 +295,9 @@ init().then((wasm: InitOutput) => {
           universeWidth,
           universeHeight
         );
-
-        if (gameStatus.play) {
-          animationId = requestAnimationFrame(renderLoop);
-        }
-      }, 1000 / frame_per_second);
-    };
-
-    requestAnimationFrame(renderLoop);
+      });
+    }
+    */
 
     if (lifeControlButton) {
       enableControlButton(
@@ -223,10 +309,13 @@ init().then((wasm: InitOutput) => {
     }
 
     if (lifeResetButton) {
-      enableResetButton(lifeResetButton, () => {
+      enableResetButton(lifeResetButton, (): void => {
         universe.reset();
-        lifePopulationElement.innerHTML = String(universe.population());
-        lifeGenerationElement.innerHTML = String(universe.generation());
+        lifePopulationElement.textContent = String(universe.population());
+        lifeGenerationElement.textContent = String(universe.generation());
+        peakPopulation = universe.population();
+        peakGeneration = universe.generation();
+
         // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
         drawCells(
           universe,
@@ -238,13 +327,16 @@ init().then((wasm: InitOutput) => {
       });
     }
 
-    lifeRandomButton.addEventListener("click", () => {
+    lifeRandomButton.addEventListener("click", (): void => {
       cancelAnimationFrame(animationId);
       gameStatus.play = false;
-      lifeControlButton.textContent = "RESUME";
+      lifeControlButton.textContent = "PLAY";
       universe.random(20);
-      lifePopulationElement.innerHTML = String(universe.population());
-      lifeGenerationElement.innerHTML = String(universe.generation());
+      lifePopulationElement.textContent = String(universe.population());
+      lifeGenerationElement.textContent = String(universe.generation());
+      peakPopulation = universe.population();
+      peakGeneration = universe.generation();
+
       // drawGrid(lifeCanvasContext, universeWidth, universeHeight);
       drawCells(
         universe,
