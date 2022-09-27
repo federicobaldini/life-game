@@ -69,13 +69,20 @@
         border: 2px solid #bcbcbc;
         border-radius: 8px;
         padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .life-game__canvas-limiter {
         overflow: hidden;
         position: relative;
+        width: 621px;
+        height: 621px;
       }
       .life-game__canvas {
         position: absolute;
-        top: 10px;
-        left: 10px;
+        top: 0px;
+        left: 0px;
       }
       .life-game__button {
         border: none;
@@ -142,15 +149,19 @@
         <p class="life-game__paragraph-info">
           Click on canvas to activate or deactivate a cell.
         </p>
+        <!--
         <p class="life-game__paragraph-info">
           Keep cursor clicked on the universe to move inside of it.
         </p>
         <p class="life-game__paragraph-info">
           Press space on keyboard to recenter the universe.
         </p>
+        -->
       </div>
       <div id="life-game__canvas-container" class="life-game__canvas-container">
-        <canvas id="life-game__canvas" class="life-game__canvas"></canvas>
+        <div class="life-game__canvas-limiter">
+          <canvas id="life-game__canvas" class="life-game__canvas"></canvas>
+        </div>
       </div>
     </div>
     <script src="./bootstrap.js"></script>
