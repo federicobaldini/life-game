@@ -19,15 +19,15 @@ For the instalation guide [click here](https://www.rust-lang.org/learn/get-start
 Just clone the repo and use cargo to run the code as shown below
 
 ```bash
-    $ git clone https://github.com/federicobaldini/life-game
-    $ cd life-game
-    life-game->$ wasm-pack build --target web
+$ git clone https://github.com/federicobaldini/life-game
+$ cd life-game
+life-game->$ wasm-pack build --target web
 ```
 
 Then to start the web application 
 
 ```bash
-    life-game->$ cd server
+life-game->$ cd server
 ```
 
 Install the dependencies:
