@@ -3,7 +3,7 @@
 A web application that play the John Conway's Game of Life, using TypeScript, Rust and WebAssembly.
 
 <p align="center">
-  <img src="https://github.com/federicobaldini/life-game/blob/master/application.png" alt="login" />
+  <img src="https://github.com/federicobaldini/life-game/blob/master/application.png" alt="application" />
 </p>
 
 ## Requirements
