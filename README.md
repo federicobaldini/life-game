@@ -1,6 +1,6 @@
 # life-game
 
-A web application that play the John Conway's Game of Life, using TypeScript, Rust and WebAssembly.
+A web application that plays the John Conway's Game of Life, using TypeScript, Rust and WebAssembly.
 
 <p align="center">
   <img src="https://github.com/federicobaldini/life-game/blob/main/application.png" alt="application" />
