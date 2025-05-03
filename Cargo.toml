@@ -1,5 +1,5 @@
 [package]
-name = "life-game"
+name = "life_game"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,4 +13,4 @@ wee_alloc = "0.4.5"
 # cdylib cannot be compiled for test, use "lib" instead
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
