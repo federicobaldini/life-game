@@ -358,7 +358,16 @@ init().then((wasm: InitOutput) => {
       cancelAnimationFrame(animationId);
       gameStatus.play = false;
       lifeControlButton.textContent = "PLAY";
-      universe.random(20);
+
+      const selectedInput: HTMLInputElement =
+        document.querySelector<HTMLInputElement>('input[name="rule"]:checked');
+
+      const selectedRule: string = selectedInput?.value ?? "B3/S23";
+      const density: number = getDensityForRule(selectedRule);
+
+      universe.reset();
+      universe.random(density);
+
       lifePopulationElement.textContent = String(universe.population());
       lifeGenerationElement.textContent = String(universe.generation());
       peakPopulation = universe.population();
