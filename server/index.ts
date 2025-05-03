@@ -3,6 +3,7 @@ import { enableControlButton } from "./utils/control-button";
 import { enableResetButton } from "./utils/reset-button";
 import { enableMouseNavigation } from "./utils/mouse-navigation";
 import { enableZoom } from "./utils/zoom-control";
+import { parseRule, getDensityForRule } from "./utils/rules";
 
 let cell_size = 1; // px
 const GRID_COLOR = "#494949";
@@ -86,10 +87,14 @@ init().then((wasm: InitOutput) => {
   const lifeRandomButton: HTMLButtonElement | null = document.getElementById(
     "life-game__random-button"
   ) as HTMLButtonElement | null;
+  const ruleSelectorForm: HTMLFormElement | null = document.getElementById(
+    "life-game__rules-form"
+  ) as HTMLFormElement | null;
+  const checkedInput: HTMLInputElement =
+    document.querySelector<HTMLInputElement>('input[name="rule"]:checked');
 
   // Construct the universe, and get its width and height.
   const universe: Universe = Universe.new(310, 310);
-  universe.random(20);
   const universeWidth: number = universe.width();
   const universeHeight: number = universe.height();
   const gameStatus: { play: boolean } = { play: false };
@@ -108,6 +113,17 @@ init().then((wasm: InitOutput) => {
   let peakGeneration: number = 0;
   let incrementZoomX: number = 0;
   let incrementZoomY: number = 0;
+
+  if (checkedInput) {
+    const [b, s] = parseRule(checkedInput.value);
+    universe.set_rule(b, s);
+    const density: number = getDensityForRule(checkedInput.value);
+    universe.random(density);
+  } else {
+    // fallback default
+    universe.set_rule(new Uint8Array([3]), new Uint8Array([2, 3])); // Conway
+    universe.random(20);
+  }
 
   const setMooving = (event: MouseEvent): void => {
     if (
@@ -311,6 +327,17 @@ init().then((wasm: InitOutput) => {
     if (lifeResetButton) {
       enableResetButton(lifeResetButton, (): void => {
         universe.reset();
+
+        // Read the currently selected rule
+        const selectedInput: HTMLInputElement =
+          document.querySelector<HTMLInputElement>(
+            'input[name="rule"]:checked'
+          );
+
+        const selectedRule: string = selectedInput?.value ?? "B3/S23";
+        const density: number = getDensityForRule(selectedRule);
+        universe.random(density);
+
         lifePopulationElement.textContent = String(universe.population());
         lifeGenerationElement.textContent = String(universe.generation());
         peakPopulation = universe.population();
@@ -346,5 +373,32 @@ init().then((wasm: InitOutput) => {
         universeHeight
       );
     });
+
+    if (ruleSelectorForm) {
+      ruleSelectorForm.addEventListener("change", (event) => {
+        const target: HTMLInputElement = event.target as HTMLInputElement;
+
+        if (target && target.name === "rule") {
+          const ruleString: string = target.value;
+          const [birth, survival] = parseRule(ruleString);
+          const density: number = getDensityForRule(ruleString);
+
+          universe.set_rule(birth, survival);
+          universe.reset();
+          universe.random(density);
+
+          lifePopulationElement.textContent = String(universe.population());
+          lifeGenerationElement.textContent = String(universe.generation());
+
+          drawCells(
+            universe,
+            lifeCanvasContext,
+            wasm.memory,
+            universeWidth,
+            universeHeight
+          );
+        }
+      });
+    }
   }
 });
