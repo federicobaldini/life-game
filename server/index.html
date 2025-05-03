@@ -111,6 +111,28 @@
         color: #bcbcbc;
         margin: 0;
       }
+      .life-game__rules-container {
+        position: fixed;
+        top: 50px;
+        right: 50px;
+        width: 16rem;
+        padding: 16px;
+        border-radius: 10px;
+        background: rgba(59, 59, 59, 0.5);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        color: #bcbcbc;
+        font-size: 14px;
+        z-index: 3;
+      }
+      .life-game__rules-form label {
+        margin: 0 0 8px 0;
+        display: block;
+        cursor: pointer;
+      }
+      .life-game__rules-form input[type="radio"] {
+        margin-right: 0.5rem;
+      }
     </style>
   </head>
   <body>
@@ -163,6 +185,51 @@
           <canvas id="life-game__canvas" class="life-game__canvas"></canvas>
         </div>
       </div>
+      <!-- Fixed menu on the right for rule selection -->
+      <div class="life-game__rules-container">
+        <form id="life-game__rules-form" class="life-game__rules-form">
+          <label class="life-game__label">Rules:</label>
+          <label title="Classic rule. Balanced between growth and decay.">
+            <input type="radio" name="rule" value="B3/S23" checked />
+            Conway
+          </label>
+          <label title="Adds rule B6 to Conway. Enables replicator patterns.">
+            <input type="radio" name="rule" value="B36/S23" />
+            HighLife
+          </label>
+          <label title="No survival; any cell born immediately dies. Chaotic and explosive.">
+            <input type="radio" name="rule" value="B2/S" />
+            Seeds
+          </label>
+          <label title="Once a cell is alive, it stays alive forever. Endless growth.">
+            <input type="radio" name="rule" value="B3/S012345678" />
+            Life Without Death
+          </label>
+          <label title="Symmetric under inversion. Rich and varied structures.">
+            <input type="radio" name="rule" value="B3678/S34678" />
+            Day & Night
+          </label>
+          <label title="Supports gliders and oscillators. Similar to Conway but more active.">
+            <input type="radio" name="rule" value="B368/S245" />
+            Morley
+          </label>
+          <label title="Highly chaotic. Amoeba-like structures fill space rapidly.">
+            <input type="radio" name="rule" value="B35678/S5678" />
+            Diamoeba
+          </label>
+          <label title="Tends to form stable or slowly changing patterns. Good for smoothing.">
+            <input type="radio" name="rule" value="B4678/S35678" />
+            Anneal
+          </label>
+          <label title="Generates slowly growing maze-like structures.">
+            <input type="radio" name="rule" value="B3/S12345" />
+            Maze
+          </label>
+          <label title="A variant of Maze with thinner paths and less stability.">
+            <input type="radio" name="rule" value="B3/S1234" />
+            Mazectric
+          </label>
+        </form>
     </div>
     <script src="./bootstrap.js"></script>
   </body>
