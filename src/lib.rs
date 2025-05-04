@@ -43,6 +43,7 @@ pub struct Universe {
     width: u32,
     height: u32,
     cells: Vec<Cell>,
+    cell_age: Vec<u8>,
     population: u32,
     generation: u32,
     rule: Rule,
@@ -80,12 +81,13 @@ impl fmt::Display for Universe {
 impl Universe {
     // constructor that initializes the universe with an interesting pattern of live and dead cells
     pub fn new(width: u32, height: u32) -> Universe {
-        let cells: Vec<Cell> = (0..width * height).map(|_| Cell::Dead).collect();
+        let size: usize = (width * height) as usize;
 
         Universe {
             width,
             height,
-            cells,
+            cells: vec![Cell::Dead; size],
+            cell_age: vec![0; size],
             population: 0,
             generation: 0,
             rule: Rule {
@@ -105,6 +107,10 @@ impl Universe {
 
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
+    }
+
+    pub fn cell_age(&self) -> *const u8 {
+        self.cell_age.as_ptr()
     }
 
     pub fn population(&self) -> u32 {
@@ -193,7 +199,7 @@ impl Universe {
                 let cell: Cell = self.cells[cell_index];
                 let live_neighbors: u8 = self.live_neighbor_count(row, col);
 
-                let next_cell = match (cell, live_neighbors) {
+                let next_cell: Cell = match (cell, live_neighbors) {
                     // If the cell is currently alive and the number of live neighbors is listed in the survival rule,
                     // the cell stays alive.
                     (Cell::Alive, n) if self.rule.survival[n as usize] == 1 => Cell::Alive,
@@ -217,6 +223,14 @@ impl Universe {
                     // Otherwise, the cell remains in its current state (no change).
                     (otherwise, _) => otherwise,
                 };
+
+                let age: u8 = match (cell, next_cell) {
+                    (Cell::Alive, Cell::Alive) => self.cell_age[cell_index].saturating_add(1),
+                    (Cell::Alive, Cell::Dead) => 0,
+                    (Cell::Dead, Cell::Alive) => 1,
+                    _ => 0,
+                };
+                self.cell_age[cell_index] = age;
 
                 next[cell_index] = next_cell;
             }
