@@ -10,9 +10,10 @@ const isPlaying: Ref<boolean> = ref(false);
 const isSettingsActive: Ref<boolean> = ref(true);
 const selectedRule: Ref<LifeRule> = ref(LifeRule.CONWAY);
 const selectedSpeed: Ref<number> = ref(60); // frame by second
-const selectedAgeData: Ref<
+const selectedAgeSettings: Ref<
   { youngColorHex: string; oldColorHex: string; maxAge: number } | undefined
 > = ref(undefined);
+const populationHistory: Ref<Array<{ generation: number; population: number }>> = ref([]);
 
 const togglePlayHandler = (): void => {
   isPlaying.value = !isPlaying.value;
@@ -30,7 +31,7 @@ const setSpeedHandler = (speed: number): void => {
   selectedSpeed.value = speed;
 };
 
-const setAgeDataHandler = (
+const setAgeSettingsHandler = (
   ageData:
     | {
         youngColorHex: string;
@@ -39,7 +40,14 @@ const setAgeDataHandler = (
       }
     | undefined,
 ): void => {
-  selectedAgeData.value = ageData;
+  selectedAgeSettings.value = ageData;
+};
+
+const setPopulationHistoryHandler = (generation: number, population: number): void => {
+  populationHistory.value.push({
+    generation: generation,
+    population: population,
+  });
 };
 </script>
 
@@ -49,17 +57,21 @@ const setAgeDataHandler = (
       :active="isSettingsActive"
       :selected-rule="selectedRule"
       :selected-speed="selectedSpeed"
-      :selected-age-data="selectedAgeData"
       @set-rule="setRuleHandler"
       @set-speed="setSpeedHandler"
-      @set-age-data="setAgeDataHandler"
     />
-    <AnalyticsItem :active="isSettingsActive" />
+    <AnalyticsItem
+      :active="isSettingsActive"
+      :population-data="populationHistory"
+      :selected-age-settings="selectedAgeSettings"
+      @set-age-settings="setAgeSettingsHandler"
+    />
     <GridItem
       :play="isPlaying"
       :rule="selectedRule"
       :speed="selectedSpeed"
-      :age="selectedAgeData"
+      :age="selectedAgeSettings"
+      @update-generation="setPopulationHistoryHandler"
     />
     <div class="home-view__actions-container">
       <MenuItem

@@ -2,7 +2,6 @@
 import { LifeRule } from '@/shared/utils/rules';
 import RulesList from './RulesList.vue';
 import SpeedSliderItem from './SpeedSliderItem.vue';
-import AgeItem from './AgeItem.vue';
 
 const props = defineProps<{
   active: boolean;
@@ -28,10 +27,6 @@ const emit = defineEmits<{
       <SpeedSliderItem
         :selected-speed="props.selectedSpeed"
         @set-speed="(speed) => emit('set-speed', speed)"
-      />
-      <AgeItem
-        :selected-age-data="props.selectedAgeData"
-        @set-age-data="(ageData) => emit('set-age-data', ageData)"
       />
     </div>
   </div>

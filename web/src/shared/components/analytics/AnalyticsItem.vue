@@ -1,12 +1,34 @@
 <script setup lang="ts">
+import AgeItem from './AgeItem.vue';
+import LivePercentageChartItem from './LivePercentageChartItem.vue';
+import PopulationChartItem from './PopulationChartItem.vue';
+import PopulationDeltaChartItem from './PopulationDeltaChartItem.vue';
+
 const props = defineProps<{
   active: boolean;
+  populationData: Array<{ generation: number; population: number }>;
+  selectedAgeSettings?: { youngColorHex: string; oldColorHex: string; maxAge: number };
+}>();
+
+const emit = defineEmits<{
+  (
+    event: 'set-age-settings',
+    ageSettings: { youngColorHex: string; oldColorHex: string; maxAge: number } | undefined,
+  ): void;
 }>();
 </script>
 
 <template>
   <div :class="['analytics-item', { active: props.active }]">
-    <div class="analytics-item__limiter"></div>
+    <div class="analytics-item__limiter">
+      <PopulationChartItem :data="props.populationData" :total-cells="310 * 310" />
+      <LivePercentageChartItem :data="props.populationData" :total-cells="310 * 310" />
+      <PopulationDeltaChartItem :data="props.populationData" />
+      <AgeItem
+        :selected-age-settings="props.selectedAgeSettings"
+        @set-age-settings="(ageSettings) => emit('set-age-settings', ageSettings)"
+      />
+    </div>
   </div>
 </template>
 

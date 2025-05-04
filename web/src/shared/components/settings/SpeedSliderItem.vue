@@ -19,7 +19,7 @@ const emit = defineEmits<{
       type="range"
       min="1"
       max="60"
-      value="selectedSpeed"
+      :value="props.selectedSpeed"
       @input="(event) => emit('set-speed', parseInt((event.target as HTMLInputElement).value))"
     />
   </div>

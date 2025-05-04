@@ -25,6 +25,10 @@ const props = withDefaults(
   },
 );
 
+const emit = defineEmits<{
+  (event: 'update-generation', generation: number, population: number): void;
+}>();
+
 const canvas = ref<HTMLCanvasElement | null>(null);
 let wasm: InitOutput;
 let universe: Universe;
@@ -97,6 +101,8 @@ const drawCells = (ctx: CanvasRenderingContext2D, width: number, height: number)
 const render = (ctx: CanvasRenderingContext2D, width: number, height: number): void => {
   const renderFrame = () => {
     universe.update();
+    emit('update-generation', universe.generation(), universe.population());
+
     drawCells(ctx, width, height);
 
     animationId = window.setTimeout(() => {

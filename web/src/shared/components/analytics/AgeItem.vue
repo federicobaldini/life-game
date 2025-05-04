@@ -1,50 +1,48 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-
 const props = defineProps<{
-  selectedAgeData?: { youngColorHex: string; oldColorHex: string; maxAge: number };
+  selectedAgeSettings?: { youngColorHex: string; oldColorHex: string; maxAge: number };
 }>();
 
 const emit = defineEmits<{
   (
-    event: 'set-age-data',
+    event: 'set-age-settings',
     value: { youngColorHex: string; oldColorHex: string; maxAge: number } | undefined,
   ): void;
 }>();
 
 const toggleAgeDataHandler = (): void => {
-  if (props.selectedAgeData !== undefined) {
-    emit('set-age-data', undefined);
+  if (props.selectedAgeSettings !== undefined) {
+    emit('set-age-settings', undefined);
   } else {
-    emit('set-age-data', { youngColorHex: '#00ff00', oldColorHex: '#ff0000', maxAge: 100 });
+    emit('set-age-settings', { youngColorHex: '#00ff00', oldColorHex: '#ff0000', maxAge: 100 });
   }
 };
 
 const setYoungColorHexHandler = (colorHex: string): void => {
-  if (props.selectedAgeData) {
-    emit('set-age-data', {
+  if (props.selectedAgeSettings) {
+    emit('set-age-settings', {
       youngColorHex: colorHex,
-      oldColorHex: props.selectedAgeData.oldColorHex,
-      maxAge: props.selectedAgeData.maxAge,
+      oldColorHex: props.selectedAgeSettings.oldColorHex,
+      maxAge: props.selectedAgeSettings.maxAge,
     });
   }
 };
 
 const setOldColorHexHandler = (colorHex: string): void => {
-  if (props.selectedAgeData) {
-    emit('set-age-data', {
-      youngColorHex: props.selectedAgeData.youngColorHex,
+  if (props.selectedAgeSettings) {
+    emit('set-age-settings', {
+      youngColorHex: props.selectedAgeSettings.youngColorHex,
       oldColorHex: colorHex,
-      maxAge: props.selectedAgeData.maxAge,
+      maxAge: props.selectedAgeSettings.maxAge,
     });
   }
 };
 
 const setMaxAgeHandler = (maxAge: number): void => {
-  if (props.selectedAgeData) {
-    emit('set-age-data', {
-      youngColorHex: props.selectedAgeData.youngColorHex,
-      oldColorHex: props.selectedAgeData.oldColorHex,
+  if (props.selectedAgeSettings) {
+    emit('set-age-settings', {
+      youngColorHex: props.selectedAgeSettings.youngColorHex,
+      oldColorHex: props.selectedAgeSettings.oldColorHex,
       maxAge,
     });
   }
@@ -56,17 +54,17 @@ const setMaxAgeHandler = (maxAge: number): void => {
     <label class="age-item__toggle">
       <input
         type="checkbox"
-        :value="props.selectedAgeData !== undefined"
+        :value="props.selectedAgeSettings !== undefined"
         @change="toggleAgeDataHandler"
       />
       Enable age-based coloring
     </label>
-    <div v-if="props.selectedAgeData" class="age-item__controls">
+    <div v-if="props.selectedAgeSettings" class="age-item__controls">
       <label>
         Young color:
         <input
           type="color"
-          :value="props.selectedAgeData.youngColorHex"
+          :value="props.selectedAgeSettings.youngColorHex"
           @change="(event) => setYoungColorHexHandler((event.target as HTMLInputElement).value)"
         />
       </label>
@@ -74,17 +72,17 @@ const setMaxAgeHandler = (maxAge: number): void => {
         Old color:
         <input
           type="color"
-          v-model="props.selectedAgeData.oldColorHex"
+          v-model="props.selectedAgeSettings.oldColorHex"
           @change="(event) => setOldColorHexHandler((event.target as HTMLInputElement).value)"
         />
       </label>
       <label>
-        Max age: {{ props.selectedAgeData.maxAge }}
+        Max age: {{ props.selectedAgeSettings.maxAge }}
         <input
           type="range"
           min="1"
           max="100"
-          :value="props.selectedAgeData.maxAge"
+          :value="props.selectedAgeSettings.maxAge"
           @change="(event) => setMaxAgeHandler(parseInt((event.target as HTMLInputElement).value))"
         />
       </label>
