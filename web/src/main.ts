@@ -11,7 +11,8 @@ import {
   CategoryScale,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler,
 } from 'chart.js';
 
 Chart.register(
@@ -22,7 +23,8 @@ Chart.register(
   CategoryScale,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler,
 );
 
 const app = createApp(App);
