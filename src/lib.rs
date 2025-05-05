@@ -1,7 +1,7 @@
 use std::fmt;
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen(module = "/server/utils/random.ts")]
+#[wasm_bindgen(module = "/web/src/shared/utils/random.ts")]
 extern "C" {
     fn randomNumber(max: usize) -> usize;
 }
